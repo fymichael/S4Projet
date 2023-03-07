@@ -1,8 +1,9 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-package FrontServlet;
+package etu1998.framework.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,7 +27,7 @@ public class FrontServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+        protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String[] a = request.getRequestURI().split("/");
@@ -38,8 +39,8 @@ public class FrontServlet extends HttpServlet {
             out.println("<title>Servlet FrontServlet</title>");            
             out.println("</head>");
             out.println("<body>");
-            out.println("<h4>Servlet FrontServlet at " + a[2]+ "</h4>");
-            out.println("<h4>Servlet FrontServlet at " + request.getQueryString()+ "</h4>");
+            out.println("<h4>" + a[2]+ "</h4>");
+            out.println("<h4>" + request.getQueryString()+ "</h4>");
             out.println("</body>");
             out.println("</html>");
         }
