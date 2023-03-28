@@ -62,6 +62,7 @@ public class FrontServlet extends HttpServlet {
         try{
             //System.out.println("etu1998.framework.servlet.FrontServlet.init()");
             Annotation a = new Annotation();
+            
             Vector<Class> vec = a.getClassFrom("etu1998.models");
             for(int i = 0; i < vec.size(); i++) { 
                 if(vec.get(i) != null) {
