@@ -7,7 +7,9 @@ package etu1998.framework.servlet;
 
 import etu1998.AllAnnotations.Method;
 import etu1998.framework.Annotation;
-import etu1998.framework.Mapping;   
+import etu1998.framework.Mapping;
+import etu1998.framework.ModelView;
+import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -24,8 +26,8 @@ import java.util.logging.Logger;
  * @author P15B-79-FY
  */
 public class FrontServlet extends HttpServlet {
-    
-    HashMap<String,Mapping> MappingUrls;
+
+    HashMap<String, Mapping> MappingUrls;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,66 +39,93 @@ public class FrontServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, Exception {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet FrontServlet</title>");            
+            out.println("<title>Servlet FrontServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet FrontServlet at " + request.getRequestURI() + "</h1>");
-            out.println("<h1>Servlet FrontServlet at " + request.getQueryString() + "</h1>");
-            for ( HashMap.Entry<String, Mapping> en : this.MappingUrls.entrySet()) {
-                out.println("<p> Le nom de la classe : "+en.getValue().getClassName()+"</p>");
-                out.println("<p> La methode : "+en.getValue().getMethod()+"</p>"); 
-           }
+            afficherHashMap();
+
+            Object o = getClassFromAnnotation("getNom");
+            if (o instanceof ModelView) {
+                ModelView mv = (ModelView) o;
+                RequestDispatcher dispatch = request.getRequestDispatcher(mv.getViewName());
+                dispatch.forward(request, response);
+            }
             out.println("</body>");
             out.println("</html>");
         }
+
     }
+
     @Override
-    public void init(){
-        try{
+    public void init() {
+        try {
             //System.out.println("etu1998.framework.servlet.FrontServlet.init()");
             Annotation a = new Annotation();
-            
+
             Vector<Class> vec = a.getClassFrom("etu1998.models");
-            for(int i = 0; i < vec.size(); i++) { 
-                if(vec.get(i) != null) {
-                    insertHashMap(vec.get(i),"emp-add");
+            for (int i = 0; i < vec.size(); i++) {
+                if (vec.get(i) != null) {
+                    insertHashMap(vec.get(i), "getNom");
                 }
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             try {
                 throw e;
             } catch (Exception ex) {
                 Logger.getLogger(FrontServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-       }
+    }
 //       
-        public void insertHashMap(Class<?> className,String query) {
-        for(int i = 0; i < className.getDeclaredMethods().length; i++) {
+
+    public void insertHashMap(Class<?> className, String query) {
+        for (int i = 0; i < className.getDeclaredMethods().length; i++) {
             //System.out.println(className.getDeclaredMethods()[i].getName());
-            if(className.getDeclaredMethods()[i].getAnnotation(Method.class).name_method().compareToIgnoreCase(query) == 0){
-              System.out.println(className.getDeclaredMethods()[i].getAnnotation(Method.class).name_method());
-              String url = className.getDeclaredMethods()[i].getAnnotation(Method.class).name_method();
-              this.MappingUrls = new HashMap();
-              this.MappingUrls.put(url, new Mapping(className.getSimpleName(),className.getDeclaredMethods()[i].getName()));
+            if (className.getDeclaredMethods()[i].getAnnotation(Method.class) != null) {
+                if (className.getDeclaredMethods()[i].getAnnotation(Method.class).name_method().equalsIgnoreCase(query) == true) {
+                    System.out.println(className.getDeclaredMethods()[i].getAnnotation(Method.class).name_method());
+                    String url = className.getDeclaredMethods()[i].getAnnotation(Method.class).name_method();
+                    this.MappingUrls = new HashMap();
+                    this.MappingUrls.put(url, new Mapping(className.getSimpleName(), className.getDeclaredMethods()[i].getName()));
+                }
             }
         }
     }
+
+    public Object getClassFromAnnotation(String annotation) throws Exception {
+        Annotation a = new Annotation();
+        Object o = null;
+        Vector<Class> vec = a.getClassFrom("etu1998.models");
+        for (int e = 0; e < vec.size(); e++) {
+            for (int i = 0; i < vec.get(e).getDeclaredMethods().length; i++) {
+                if (vec.get(e).getDeclaredMethods()[i].getAnnotation(Method.class) != null) {
+                    if (vec.get(e).getDeclaredMethods()[i].getAnnotation(Method.class).name_method().equalsIgnoreCase(annotation) == true) {
+                        //System.out.println("etu1998.framework.servlet.FrontServlet.check3()"+vec.get(e).getDeclaredMethods()[i].getName());
+                       Object ob = vec.get(e).getDeclaredConstructor(new Class[0]).newInstance(new Object[0]);
+                        //o = vec.get(e).getDeclaredMethods()[i].invoke(vec.get(e).getDeclaredConstructor(new Class[0]).newInstance(new Object[0]), new Object[0]);
+                        java.lang.reflect.Method fonction = vec.get(e).getDeclaredMethods()[i];
+                        o = fonction.invoke( ob, new Object[0]);
+                    }
+                }
+            }
+        }
+        return o;
+    }
 //       
-       public void afficherHashMap(){
-           for ( HashMap.Entry<String, Mapping> en : this.MappingUrls.entrySet()) {
-            System.out.println(" Le nom de la classe : "+en.getValue().getClassName());
-            System.out.println(" La methode : "+en.getValue().getMethod()); 
-           }
-       }
+
+    public void afficherHashMap() {
+        for (HashMap.Entry<String, Mapping> en : this.MappingUrls.entrySet()) {
+            System.out.println(" Le nom de la classe : " + en.getValue().getClassName());
+            System.out.println(" La methode : " + en.getValue().getMethod());
+        }
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -110,7 +139,11 @@ public class FrontServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (Exception ex) {
+            Logger.getLogger(FrontServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -124,7 +157,11 @@ public class FrontServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (Exception ex) {
+            Logger.getLogger(FrontServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
