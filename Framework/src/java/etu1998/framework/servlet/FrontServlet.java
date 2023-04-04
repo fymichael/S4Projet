@@ -51,12 +51,12 @@ public class FrontServlet extends HttpServlet {
             out.println("<body>");
             afficherHashMap();
 
-            Object o = getClassFromAnnotation("getNom");
-            if (o instanceof ModelView) {
-                ModelView mv = (ModelView) o;
-                RequestDispatcher dispatch = request.getRequestDispatcher(mv.getViewName());
-                dispatch.forward(request, response);
-            }
+            // Object o = getClassFromAnnotation("getNom");
+            // if (o instanceof ModelView) {
+            //     ModelView mv = (ModelView) o;
+            //     RequestDispatcher dispatch = request.getRequestDispatcher(mv.getViewName());
+            //     dispatch.forward(request, response);
+            // }
             out.println("</body>");
             out.println("</html>");
         }
@@ -72,7 +72,7 @@ public class FrontServlet extends HttpServlet {
             Vector<Class> vec = a.getClassFrom("etu1998.models");
             for (int i = 0; i < vec.size(); i++) {
                 if (vec.get(i) != null) {
-                    insertHashMap(vec.get(i), "getNom");
+                    insertHashMap(vec.get(i), "emp-all");
                 }
             }
         } catch (Exception e) {
