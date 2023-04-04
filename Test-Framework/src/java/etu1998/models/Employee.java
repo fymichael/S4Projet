@@ -6,6 +6,7 @@
 package etu1998.models;
 
 import etu1998.AllAnnotations.Method;
+import etu1998.framework.ModelView;
 
 /**
  *
@@ -18,6 +19,25 @@ public class Employee {
 
     public Employee() {
     }
+
+    @Method(name_method = "getNom")
+    public ModelView getNom() {
+        ModelView mv = new ModelView("index.jsp");
+        return mv;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getPrenom() {
+        return prenom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+   
     
 //    @Method(name_method = "emp-add")
     public void emp_add(){
